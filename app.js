@@ -5,7 +5,7 @@ const productRoutes = require('./routes/product');
 const userRoutes = require('./routes/user');
 const path = require('path');
 
-mongoose.connect('mongodb+srv://nimondo:Dibalba2020@cluster0.c1m91.mongodb.net/test?retryWrites=true&w=majority',
+mongoose.connect(process.env.MONGODB,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
