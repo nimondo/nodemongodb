@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const productRoutes = require('./routes/product');
 const userRoutes = require('./routes/user');
+const path = require('path');
 
 mongoose.connect('mongodb+srv://nimondo:Dibalba2020@cluster0.c1m91.mongodb.net/test?retryWrites=true&w=majority',
   { useNewUrlParser: true,
@@ -23,6 +24,8 @@ app.use((req, res, next) => {
 
 app.use(express.urlencoded({extended: true}));
 app.use(express.json()) // To parse the incoming requests with JSON payloads
+
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 //product
 app.use('/api/products', productRoutes);

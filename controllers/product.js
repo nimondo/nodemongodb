@@ -1,14 +1,19 @@
 const Product = require('../models/product');
+const fs = require('fs');
+
 
 exports.createProduct =  (req, res, next) => {
-    console.log(req.body);
-    delete req.body._id;
+    
+    // delete req.body._id;
+    const thingObject = JSON.parse(req.body.thing);
+    delete thingObject._id;
     const product = new Product({
-      ...req.body
-    });
-    product.save()
-      .then((product) => res.status(201).json({product}))
-      .catch(error => res.status(400).json({ error }));
+        ...thingObject,
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+  });
+  product.save()
+    .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
+    .catch(error => res.status(400).json({ error }));
   }
 
 exports.getProducts = (req, res, next) => {
@@ -24,13 +29,25 @@ exports.getOneProduct =   (req, res, next) => {
 }
 
 exports.updateProduct = (req, res, next) => {
-    Product.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
+    const thingObject = req.file ?
+    {
+      ...JSON.parse(req.body.thing),
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    } : { ...req.body };
+  Product.updateOne({ _id: req.params.id }, { ...thingObject, _id: req.params.id })
       .then(() => res.status(200).json({ message: 'Modified!'}))
       .catch(error => res.status(400).json({ error }));
 }
 
 exports.deleteProduct = (req, res, next) => {
-    Product.deleteOne({ _id: req.params.id })
-      .then(() => res.status(200).json({ message: 'Deleted!'}))
-      .catch(error => res.status(400).json({ error }));
+    Product.findOne({ _id: req.params.id })
+    .then(thing => {
+      const filename = thing.imageUrl.split('/images/')[1];
+      fs.unlink(`images/${filename}`, () => {
+        Product.deleteOne({ _id: req.params.id })
+          .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
+          .catch(error => res.status(400).json({ error }));
+      });
+    })
+    .catch(error => res.status(500).json({ error }));
 }
