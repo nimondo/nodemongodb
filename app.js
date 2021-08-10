@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const productRoutes = require('./routes/product');
+const userRoutes = require('./routes/user');
 
 mongoose.connect('mongodb+srv://nimondo:Dibalba2020@cluster0.c1m91.mongodb.net/test?retryWrites=true&w=majority',
   { useNewUrlParser: true,
@@ -25,6 +26,8 @@ app.use(express.json()) // To parse the incoming requests with JSON payloads
 
 //product
 app.use('/api/products', productRoutes);
+//auth
+app.use('/api/auth', userRoutes);
 
 
 
